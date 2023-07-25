@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p id="temp">Temperature: <%= thermostat.temp %>°C</p>
+    <p id="PSM">PSM: <%= thermostat.powerSavingMode ? "On": "Off" %></p>
+    <button id="upBtn" onclick="up()">Up</button>
+    <button id="downBtn" onclick="down()">Down</button>
+    <button id="togglePSM" onclick="togglePowerSavingMode()">
+      Toggle Power Saving Mode
+    </button>
+
+    <script>
+      function up() {
+        console.log("Clicked");
+        fetch("/thermostat/up")
+          .then((res) => res.json())
+          .then((res) => {
+            const temp = res.temp;
+            document.getElementById(
+              "temp"
+            ).innerText = `Temperature: ${temp}°C`;
+
+            console.log(res);
+
+            if (res.temp >= 25 && res.powerSavingMode) {
+              document.getElementById("upBtn").disabled = true;
+            }
+
+            if (res.temp >= 10 && document.getElementById("downBtn").disabled) {
+              document.getElementById("downBtn").disabled = false;
+            }
+          });
+      }
+
+      function down() {
+        fetch("/thermostat/down")
+          .then((res) => res.json())
+          .then((res) => {
+            const temp = res.temp;
+            document.getElementById(
+              "temp"
+            ).innerText = `Temperature: ${temp}°C`;
+
+            if (res.temp <= 25 && document.getElementById("upBtn").disabled) {
+              document.getElementById("upBtn").disabled = false;
+            }
+
+            if (res.temp <= 10) {
+              document.getElementById("downBtn").disabled = true;
+            }
+          });
+      }
+
+      function togglePowerSavingMode() {
+        console.log("clicked!");
+        const element = document.getElementById("PSM");
+        let mode;
+
+        if (element.innerText === "PSM: On") mode = "off";
+        else mode = "on";
+
+        fetch(`/thermostat/power-saving-mode/${mode}`)
+          .then((res) => res.json())
+          .then((res) => {
+            let formattedText = res.powerSavingMode ? "On" : "Off";
+            document.getElementById("PSM").innerText = `PSM: ${formattedText}`;
+
+            if (document.getElementById("upBtn").disabled && !mode)
+              document.getElementById("upBtn").disabled = false;
+
+            if (res.temp === 25)
+              document.getElementById(
+                "temp"
+              ).innerText = `Temperature: ${res.temp}°C`;
+          });
+      }
+    </script>
+  </body>
+</html>
