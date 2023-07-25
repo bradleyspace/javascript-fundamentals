@@ -1,0 +1,16 @@
+{
+  "name": "05-calling-apis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/api.js",
+  "scripts": {
+    "run": "node .",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^29.6.1",
+    "node-fetch": "^2.6.12"
+  }
+}
